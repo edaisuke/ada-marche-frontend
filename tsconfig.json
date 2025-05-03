@@ -1,0 +1,15 @@
+{
+	// https://nuxt.com/docs/guide/concepts/typescript
+	"extends": "./.nuxt/tsconfig.json",
+	"include": [
+		"i18n/locales/**/*.ts",
+		"components/**/*.vue",
+		"pages/**/*.vue",
+		"app.vue",
+		"i18n/ja.ts"
+	],
+	"compilerOptions": {
+		"types": ["vue", "vue-i18n"],
+		"baseUrl": "."
+	}
+}

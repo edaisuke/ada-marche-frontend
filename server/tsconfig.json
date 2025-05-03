@@ -1,0 +1,10 @@
+{
+	"extends": "../.nuxt/tsconfig.server.json",
+	"include": [
+		"../i18n/locales/**/*.ts",    // ✅ 型付き翻訳ファイルを含める！
+		"../.nuxt",              // Nuxt本体
+		"../types",              // カスタム型などがあれば
+		"../**/*.ts",            // その他 *.ts ファイルも補完対象に
+		"../**/*.vue"            // *.vue も型補完に含める（SFC対応）
+	]
+}
