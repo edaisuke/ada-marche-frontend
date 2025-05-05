@@ -75,6 +75,94 @@ export default {
 
         cancel: "同意しない",
         register: "同意する",
+
+        error: {
+            last_name: {
+                required: "姓は必須です。",
+                max: "姓は最大50文字までです。",
+            },
+            first_name: {
+                required: "名は必須です。",
+                max: "名は最大50文字までです。",
+            },
+            last_kana: {
+                required: "セイは必須です。",
+                max: "セイは最大50文字までです。",
+            },
+            first_kana: {
+                required: "メイは必須です。",
+                max: "メイは最大50文字までです。",
+            },
+            display_name: {
+                required: "表示名は必須です。",
+                max: "表示名は最大50文字までです。",
+            },
+            post_code: {
+                required: "郵便番号は必須です。",
+                max: "郵便番号は最大8文字までです。",
+                regex: "郵便番号は半角数字で入力してください。",
+            },
+            prefecture: {
+                required: "都道府県は必須です。",
+            },
+            address1: {
+                required: "市区町村名は必須です。",
+                max: "市区町村名は最大50文字までです。",
+            },
+            address2: {
+                required: "番地は必須です。",
+                max: "番地は最大50文字までです。",
+            },
+            address3: {
+                max: "建物名・部屋番号は最大50文字までです。",
+            },
+            phone_number: {
+                required: "電話番号は必須です。",
+                max: "電話番号は最大15文字までです。",
+                regex: "電話番号は半角数字で入力してください。",
+            },
+            email: {
+                required: "メールアドレスは必須です。",
+                max: "メールアドレスは最大100文字までです。",
+                invalid: "メールアドレスの形式が正しくありません。",
+                unique: "このメールアドレスはすでに登録されています。",
+                same: "メールアドレスが一致しません。",
+                confirm: "メールアドレス確認が一致しません。",
+            },
+            email_confirm: {
+                required: "メールアドレス確認は必須です。",
+                max: "メールアドレス確認は最大100文字までです。",
+                regex: "メールアドレス確認の形式が正しくありません。",
+                same: "メールアドレスと一致しません。",
+            },
+            password: {
+                required: "パスワードは必須です。",
+                min: "パスワードは10文字以上で入力してください。",
+                max: "パスワードは最大100文字までです。",
+                regex: "パスワードは半角英数字で入力してください。",
+                strong: "パスワードは強力なものを選択してください。",
+                same: "パスワードと一致しません。",
+                confirm: "パスワードが一致しません。",
+            },
+            birthday: {
+                required: "生年月日は必須です。",
+                invalid: "生年月日が正しくありません。",
+            },
+            gender: {
+                required: "性別は必須です。",
+                invalid: "性別が正しくありません。",
+            },
+            job: {
+                required: "職業は必須です。",
+                invalid: "職業が正しくありません。",
+            },
+            terms: {
+                required: "利用規約に同意する必要があります。",
+            },
+            privacy: {
+                required: "プライバシーポリシーに同意する必要があります。",
+            }
+        }
     },
 
     forgot: {
@@ -103,5 +191,54 @@ export default {
     },
 
     shipping_charge: "送料は当サイトが負担いたします。",
+
+    password: {
+        show: "表示",
+        hide: "非表示",
+        strength: "強度",
+        warning_label: "⚠ 警告",
+        toggle_visibility: "パスワード表示切替",
+        please_enter: "パスワードを入力してください。",
+        
+        strength_level: {
+            0: "非常に弱い",
+            1: "弱い",
+            2: "普通",
+            3: "強い",
+            4: "非常に強い"
+        },
+
+        checklist: {
+            upper: "英大文字を含む",
+            lower: "英小文字を含む",
+            number: "数字を含む",
+            symbol: "記号を含む",
+            length: "10文字以上",
+            repeat: "同じ文字の繰り返しを避ける",
+            sequence: "連続した文字列を避ける",
+        },
+
+        warning: {
+            "This is a top-10 common password.": 'これは最もよく使われているパスワードの一つです。',
+            "This is a top-100 common password.": 'これは非常によく使われているパスワードです。',
+            "This is a very common password.": 'これはよく使われるパスワードです。',
+            "This is similar to a commonly used password.": 'これはよく使われるパスワードに似ています。',
+            "A word by itself is easy to guess.": '単語だけでは推測されやすいです。',
+            "Names and surnames by themselves are easy to guess.": '名前や姓だけでは推測されやすいです。'
+        },
+
+        suggestions: {
+            uncommonWords: '単語をさらに1つか2つ追加してください。珍しい単語がより安全です。',
+            avoidSequences: '「1234」のような連番を避けてください。',
+            avoidRecentYears: '最近の西暦年（例：2023）を避けてください。',
+            avoidPersonalYears: 'あなたに関連する年（生年月日など）を避けてください。',
+            capsDontHelp: '大文字を使ってもあまり強度は上がりません。',
+            allCaps: 'すべて大文字でもすべて小文字でも推測のしやすさは変わりません。',
+            reversed: '単語を逆さにしても大して安全にはなりません。',
+            predictableSubstitution: '「\\u0040」を「a」の代わりに使うなどの置き換えは、あまり強化につながりません。',
+            useFewWords: 'いくつかの単語を使用し、よく使われるフレーズは避けてください。',
+            noNeedForSymbols: '記号、数字、大文字は必ずしも必要ありません。'
+        }
+    }
 
 } as const
