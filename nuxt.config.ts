@@ -72,6 +72,9 @@ export default defineNuxtConfig({
 			useCookie: true,
 			fallbackLocale: 'ja'
 		},
+		bundle: {
+			optimizeTranslationDirective: false,
+		},
 		dynamicHtmlAttrs: true,
 	},
 	devServer: {
