@@ -42,7 +42,8 @@ export default defineNuxtConfig({
 		//    '@nuxtjs/nuxtjs-heroicons/solid/24/mini',
 		//    '@nuxtjs/nuxtjs-heroicons/solid/24/solid',
 		'@nuxtjs/i18n',
-		'@nuxt/icon'
+		'@nuxt/icon',
+		'@pinia/nuxt'
 	],
 	vite: {
 		server: {

@@ -39,7 +39,7 @@
 						{{ $t('register.last_kana') }}
 					</label> <span class="text-red-500">*</span>
 					<div class="">
-						<input v-model="form.last_kana" @blur="touched.last_kana = true" @input="touched.last_kana && validateField('last_kana')" type="text" :placeholder="$t('register.last_kana')" class="border border-gray-300 p-2 rounded w-full" />
+						<input v-model="form.last_kana" @blur="touched.last_kana = true" @input="form.last_kana = toFullWidthKatakana(form.last_kana); touched.last_kana && validateField('last_kana')" type="text" :placeholder="$t('register.last_kana')" class="border border-gray-300 p-2 rounded w-full" />
 						<p class="text-red-500 text-sm" v-if="errors.last_kana">
 							{{ errors.last_kana }}
 						</p>
@@ -51,7 +51,7 @@
 						{{ $t('register.first_kana') }}
 					</label> <span class="text-red-500">*</span>
 					<div class="">
-						<input v-model="form.first_kana" @blur="touched.first_kana = true" @input="touched.first_kana && validateField('first_kana')" type="text" :placeholder="$t('register.first_kana')" class="border border-gray-300 p-2 rounded w-full" />
+						<input v-model="form.first_kana" @blur="touched.first_kana = true" @input="form.first_kana = toFullWidthKatakana(form.first_kana); touched.first_kana && validateField('first_kana')" type="text" :placeholder="$t('register.first_kana')" class="border border-gray-300 p-2 rounded w-full" />
 						<p class="text-red-500 text-sm" v-if="errors.first_kana">
 							{{ errors.first_kana }}
 						</p>
@@ -90,6 +90,20 @@
 					</div>
 				</div>
 
+				<div class="flex-1 content-end">
+					<button type="button" @click="handleSearch" class="bg-blue-600 text-white px-4 py-2 bottom-0 rounded">
+						郵便番号で検索
+					</button>
+					<div v-if="error" class="text-red-500 text-sm">{{ error }}</div>
+
+					<PostalCandidateModal
+						:show="showModal"
+						:candidates="results"
+						@select="onSelect"
+						@close="showModal = false"
+					/>
+				</div>
+
 			</div>
 
 			<div class="flex flex-col sm:flex-row md:flex-row gap-6 mx-5 mt-2">
@@ -98,13 +112,16 @@
 					<label class="font-bold">
 						{{ $t('register.prefecture') }}
 					</label> <span class="text-red-500">*</span>
-					<div class="">
-						<select name="prefecture" v-model.number="form.prefecture" @change="touched.prefecture = true; validateField('prefecture')" class="border border-gray-300 p-2 rounded w-full">
-							<option value="0">選択してください</option>
-							<option v-for="pref in prefs" :key="pref.id" :value="pref.id">
-								{{ pref.name }}
+					<div class="relative w-full max-w-md">
+						<select v-model.number="form.prefecture" :disabled="prefs.loading.value" @change="touched.prefecture = true; validateField('prefecture')" class="border border-gray-300 p-2 rounded w-full">
+							<option value="0">
+								{{ prefs.loading.value ? $t('register.loading') : $t('register.select') }}
+							</option>
+							<option v-for="p in prefs.data.value" :key="p.id" :value="p.id">
+								{{ p.name }}
 							</option>
 						</select>
+						<Icon v-if="prefs.loading.value" name="mdi:loading" class="absolute right-8 top-2.5 animate-spin text-blue-400 text-xl" />
 						<p class="text-red-500 text-sm" v-if="errors.prefecture">
 							{{ errors.prefecture }}
 						</p>
@@ -168,7 +185,7 @@
 						{{ $t('register.phone_number') }}
 					</label> <span class="text-red-500">*</span>
 					<div class="">
-						<input type="number" v-model="form.phone_number" @blur="touched.phone_number = true" @input="touched.phone_number && validateField('phone_number')" :placeholder="$t('register.phone_number')" class="border border-gray-300 p-2 rounded w-full" />
+						<input type="tel" v-model="form.phone_number" @blur="touched.phone_number = true" @input="touched.phone_number && validateField('phone_number')" :placeholder="$t('register.phone_number')" class="border border-gray-300 p-2 rounded w-full" />
 						<p class="text-red-500 text-sm" v-if="errors.phone_number">
 							{{ errors.phone_number }}
 						</p>
@@ -215,7 +232,7 @@
 						{{ $t('register.password') }}
 					</label> <span class="text-red-500">*</span>
 					<div class="">
-						<PasswordStrengthBar v-model="form.password" @update:score="handleScore" @blur="touched.password = true" @input="touched.password && validateField('password')" :placeholder="$t('register.password')" autocomplete="new-password" />
+						<PasswordStrengthBar v-model="form.password" @update:score="handleScore" @update:strictScore="handleStrictScore" @blur="touched.password = true" @input="touched.password && validateField('password')" :placeholder="$t('register.password')" autocomplete="new-password" />
 						<p class="text-red-500 text-sm" v-if="errors.password">
 							{{ errors.password }}
 						</p>
@@ -263,8 +280,12 @@
 						{{ $t('register.gender') }}
 					</label>
 					<div class="p-2">
-						<span
-							v-for="gender in genders"
+						<span v-if="genders.loading.value">
+							<Icon v-if="prefs.loading.value" name="mdi:loading" class="absolute top-2.5 animate-spin text-blue-400 text-xl" />
+							{{ $t('register.loading') }}
+						</span>
+						<span v-else
+							v-for="gender in genders.data.value"
 							:key="gender.id"
 							class="mr-4"
 						>
@@ -287,13 +308,17 @@
 					<label class="font-bold">
 						{{ $t('register.job') }}
 					</label>
-					<div class="">
-						<select name="job" v-model.number="form.job" @change="touched.job = true; validateField('job')" class="border border-gray-300 p-2 rounded w-full">
-							<option value="0">選択してください</option>
-							<option v-for="job in jobs" :key="job.id" :value="job.id">
+					<div class="relative">
+						<select name="job" v-model.number="form.job" :disabled="jobs.loading.value" @change="touched.job = true; validateField('job')" class="border border-gray-300 p-2 rounded w-full">
+							<option value="0">
+								{{ jobs.loading.value ? $t('register.loading') : $t('register.select') }}
+							</option>
+							<option v-for="job in jobs.data.value" :key="job.id" :value="job.id">
 								{{ job.name }}
 							</option>
 						</select>
+						<Icon v-if="prefs.loading.value" name="mdi:loading" class="absolute right-8 top-2.5 animate-spin text-blue-400 text-xl" />
+
 						<p class="text-red-500 text-sm" v-if="errors.job">
 							{{ errors.job }}
 						</p>
@@ -353,31 +378,82 @@
 
 	import { useI18n } from 'vue-i18n'
 	import { useAsyncData } from 'nuxt/app'
-	import { ref } from 'vue'
+	import { ref, watch, watchEffect } from 'vue'
 	import { z } from 'zod'
+	import { useAllSelectables } from '../../composables/useAllSelectables'
+	import { usePostalCodeSearch } from '../../composables/usePostalCodeSearch'
 	import PasswordStrengthBar from '~/components/PasswordStrengthBar'
+	import PostalCandidateModal from '../../components/PostalCandidateModal'
 
 	const { t: $t } = useI18n()
+
+	const { prefs, jobs, genders, refreshAll } = useAllSelectables({
+		include: ['prefs', 'jobs', 'genders']
+	})
+
+	const passwordSchema = z
+		.string()
+		.trim()
+		.min(10, $t('register.error.password.min'))
+		.nonempty($t('register.error.password.required'))
+		.superRefine((val, ctx) => {
+			if (passwordStrictScore.value < 4) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: $t('register.error.password.weak')
+				})
+			}
+		})
+
+	// 全角カタカナ・長音記号のみ（空白禁止）
+	const fullWidthKatakanaRegex = /^[\u30A0-\u30FFー]+$/
+
+	// カタカナ変換関数
+	function toFullWidthKatakana(input: string): string {
+		// ひらがな → カタカナ変換
+		const kana = input.replace(/[\u3041-\u3096]/g, s =>
+			String.fromCharCode(s.charCodeAt(0) + 0x60)
+		)
+		// 半角カナ → 全角カナ（代表的なもののみ）
+		return kana.replace(/[\uff61-\uff9f]/g, (s) =>
+			String.fromCharCode(s.charCodeAt(0) + 0x60)
+		)
+	}
 
 	const schema = z.object({
 		last_name: z.string().min(1, $t('register.error.last_name.required')),
 		first_name: z.string().min(1, $t('register.error.first_name.required')),
-		last_kana: z.string().min(1, $t('register.error.last_kana.required')),
-		first_kana: z.string().min(1, $t('register.error.first_kana.required')),
+		last_kana: z
+			.string()
+			.min(1, $t('register.error.last_kana.required'))
+			.regex(fullWidthKatakanaRegex, $t('register.error.last_kana.katakana')),
+		first_kana: z
+			.string()
+			.min(1, $t('register.error.first_kana.required'))
+			.regex(fullWidthKatakanaRegex, $t('register.error.first_kana.katakana')),
 		display_name: z.string().min(1, $t('register.error.display_name.required')),
-		post_code: z.string().length(7, $t('register.error.post_code.required')),
+		post_code: z
+			.string()
+			.regex(/^\d{3}\-?\d{4}/, $t('register.error.post_code.regex'))
+			.min(1, $t('register.error.post_code.required'))
+			.max(8, $t('register.error.post_code.max')),
 		prefecture: z.number().min(1, $t('register.error.prefecture.required')),
 		address1: z.string().min(1, $t('register.error.address1.required')),
 		address2: z.string().min(1, $t('register.error.address2.required')),
 		address3: z.string().optional(),
-		phone_number: z.number().min(10, $t('register.error.phone_number.required')),
-		email: z.string().min(1, $t('register.error.email.required')).email($t('register.error.email.invalid')),
-		email_confirm: z.string(),
-		password: z
+		phone_number: z
 			.string()
-			.min(10, $t('register.error.password.min'))
-			.refine((val) => passwordScore.value > 1, $t('register.error.password.weak')),
-		password_confirm: z.string(),
+			.min(10, $t('register.error.phone_number.required'))
+			.regex(/^\d+$/, $t('register.error.phone_number.only_number')),
+		email: z
+			.string()
+			.min(1, $t('register.error.email.required'))
+			.email($t('register.error.email.invalid')),
+		email_confirm: z.string(),
+		password: passwordSchema,
+		password_confirm: z
+			.string()
+			.min(10, $t('register.error.password_confirm.min')),
 		birthday: z.string().optional(),
 		gender: z
 			.number()
@@ -421,11 +497,16 @@
 	)
 
 	const passwordScore = ref<number>(0)
+	const passwordStrictScore = ref<number>(0)
 
 	const errors = ref(createEmptyErrors())
 
 	function handleScore(score: number) {
 		passwordScore.value = score
+	}
+
+	function handleStrictScore(score: number) {
+		passwordStrictScore.value = score
 	}
 
 	function validateField(field: keyof typeof form.value) {
@@ -467,7 +548,7 @@
 
 		const fullSchema = schema
 			.refine(data => data.password === data.password_confirm, {
-					message: $t('register.error.password.confirm'),
+					message: $t('register.error.password_confirm.same'),
 					path: ['password_confirm']
 			})
 			.refine(data => data.email === data.email_confirm, {
@@ -501,19 +582,36 @@
 	}
 
 
-	const { data: genders, error: genderError } = useAsyncData<{ Gender: { id: number, name: string } }>('genders', () => {
-		return $fetch('/api/account/genders', {
-			method: 'GET'
-		})
-	})
-	const { data: jobs, error: jobError } = useAsyncData<{ Job: { id: number, name: string } }>('jobs', () => {
-		return $fetch('/api/account/jobs', {
-			method: 'GET'
-		})
-	})
-	const { data: prefs, error: prefError } = useAsyncData<{ Pref: { id: number, name: string } }>('prefs', () => {
-		return $fetch('/api/account/prefs', {
-			method: 'GET'
-		})
-	})
+	// 郵便番号検索
+	const {
+		results,
+		loading,
+		error,
+		searchByPostalCode,
+	} = usePostalCodeSearch()
+
+	const showModal = ref(false)
+
+	const handleSearch = async () => {
+		await searchByPostalCode(form.value.post_code)
+
+		if (results.value.length === 1) {
+			applyResult(0)
+		} else if (results.value.length > 1) {
+			showModal.value = true
+		}
+	}
+
+	const applyResult = (index: number) => {
+		const result = results.value[index]
+		form.value.prefecture = Number(result.prefcode)
+		form.value.address1 = result.address1
+		form.value.address2 = result.address2
+	}
+
+	const onSelect = (index: number) => {
+		applyResult(index)
+		showModal.value = false
+	}
+
 </script>

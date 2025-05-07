@@ -76,7 +76,11 @@ export default {
         cancel: "同意しない",
         register: "同意する",
 
+        loading: '読み込み中...',
+        select: '選択してください',
+
         error: {
+
             last_name: {
                 required: "姓は必須です。",
                 max: "姓は最大50文字までです。",
@@ -88,10 +92,12 @@ export default {
             last_kana: {
                 required: "セイは必須です。",
                 max: "セイは最大50文字までです。",
+                katakana: '全角カタカナのみで入力してください',
             },
             first_kana: {
                 required: "メイは必須です。",
                 max: "メイは最大50文字までです。",
+                katakana: '全角カタカナのみで入力してください',
             },
             display_name: {
                 required: "表示名は必須です。",
@@ -100,7 +106,7 @@ export default {
             post_code: {
                 required: "郵便番号は必須です。",
                 max: "郵便番号は最大8文字までです。",
-                regex: "郵便番号は半角数字で入力してください。",
+                regex: "郵便番号は半角数字のみかハイフンを含む形式で入力してください。",
             },
             prefecture: {
                 required: "都道府県は必須です。",
@@ -117,9 +123,9 @@ export default {
                 max: "建物名・部屋番号は最大50文字までです。",
             },
             phone_number: {
-                required: "電話番号は必須です。",
+                required: "電話番号は10文字以上で入力してください。",
                 max: "電話番号は最大15文字までです。",
-                regex: "電話番号は半角数字で入力してください。",
+                only_number: "電話番号は半角数字で入力してください。",
             },
             email: {
                 required: "メールアドレスは必須です。",
@@ -141,8 +147,13 @@ export default {
                 max: "パスワードは最大100文字までです。",
                 regex: "パスワードは半角英数字で入力してください。",
                 strong: "パスワードは強力なものを選択してください。",
+                weak: "パスワードは強力なものを入力してください。",
+            },
+            password_confirm: {
+                required: "パスワード確認は必須です。",
+                min: "パスワード確認は10文字以上で入力してください。",
+                max: "パスワード確認は最大100文字までです。",
                 same: "パスワードと一致しません。",
-                confirm: "パスワードが一致しません。",
             },
             birthday: {
                 required: "生年月日は必須です。",
