@@ -264,7 +264,21 @@
 						{{ $t('register.birthday') }}
 					</label>
 					<div class="">
+						<select v-model="form.birthday.year" class="border rounded p-2">
+							<option value="0">年</option>
+							<option v-for="y in years" :key="y" :value="y">{{ y }}年</option>
+						</select>
+						<select v-model="form.birthday.month" class="border rounded p-2">
+							<option value="0">月</option>
+							<option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
+						</select>
+						<select v-model="form.birthday.day" class="border rounded p-2">
+							<option value="0">日</option>
+							<option v-for="d in daysInMonth" :key="d" :value="d">{{ d }}日</option>
+						</select>
+						<!--
 						<input type="text" v-model="form.birthday" @blur="touched.birthday = true" @input="touched.birthday && validateField('birthday')" :placeholder="$t('register.birthday')" class="border border-gray-300 p-2 rounded w-full" />
+						-->
 						<p class="text-red-500 text-sm" v-if="errors.birthday">
 							{{ errors.birthday }}
 						</p>
@@ -281,7 +295,7 @@
 					</label>
 					<div class="p-2">
 						<span v-if="genders.loading.value">
-							<Icon v-if="prefs.loading.value" name="mdi:loading" class="absolute top-2.5 animate-spin text-blue-400 text-xl" />
+							<Icon v-if="prefs.loading.value" name="mdi:loading" class="absolute left-8 top-2.5 animate-spin text-blue-400 text-xl" />
 							{{ $t('register.loading') }}
 						</span>
 						<span v-else
@@ -378,7 +392,7 @@
 
 	import { useI18n } from 'vue-i18n'
 	import { useAsyncData } from 'nuxt/app'
-	import { ref, watch, watchEffect } from 'vue'
+	import { computed, ref, watch, watchEffect } from 'vue'
 	import { z } from 'zod'
 	import { useAllSelectables } from '../../composables/useAllSelectables'
 	import { usePostalCodeSearch } from '../../composables/usePostalCodeSearch'
@@ -391,6 +405,26 @@
 		include: ['prefs', 'jobs', 'genders']
 	})
 
+	// カタカナ変換関数
+	function toFullWidthKatakana(input: string): string {
+		if (!input) return ''
+
+		// ひらがな → カタカナ変換
+		let text = input.replace(/[\u3041-\u3096]/g, s =>
+			String.fromCharCode(s.charCodeAt(0) + 0x60)
+		)
+		// 半角カナ → 全角カナ（代表的なもののみ）
+		text = text.replace(/[\uff61-\uff9f]/g, (s) =>
+			String.fromCharCode(s.charCodeAt(0) + 0x60)
+		)
+
+		// 空白・句読点・記号の除去
+		text = text.replace(/[。、・･｡｢｣｢｣､｀¨!！"“”#$%&'‘’()（）*+,-.／:;<=>?＠\[\\\]^_`{|}~ 　\t\r\n]/g, '')
+
+		return text
+	}
+
+	// パスワードのスキーマ
 	const passwordSchema = z
 		.string()
 		.trim()
@@ -407,18 +441,6 @@
 
 	// 全角カタカナ・長音記号のみ（空白禁止）
 	const fullWidthKatakanaRegex = /^[\u30A0-\u30FFー]+$/
-
-	// カタカナ変換関数
-	function toFullWidthKatakana(input: string): string {
-		// ひらがな → カタカナ変換
-		const kana = input.replace(/[\u3041-\u3096]/g, s =>
-			String.fromCharCode(s.charCodeAt(0) + 0x60)
-		)
-		// 半角カナ → 全角カナ（代表的なもののみ）
-		return kana.replace(/[\uff61-\uff9f]/g, (s) =>
-			String.fromCharCode(s.charCodeAt(0) + 0x60)
-		)
-	}
 
 	const schema = z.object({
 		last_name: z.string().min(1, $t('register.error.last_name.required')),
@@ -454,7 +476,26 @@
 		password_confirm: z
 			.string()
 			.min(10, $t('register.error.password_confirm.min')),
-		birthday: z.string().optional(),
+		birthday: z
+			.object({
+				year: z
+					.number()
+					.optional(),
+				month: z
+					.number()
+					.optional(),
+				day: z
+					.number()
+					.optional()
+			})
+			.refine(({ year, month, day }) => {
+				if (year === 0 && month === 0 && day === 0) return true
+				const date = new Date(`${year}-${month}-${day}`)
+				return !isNaN(date.getTime())
+			}, {
+				message: '正しい日付を選択してください',
+				path: ['birthday']
+			}),
 		gender: z
 			.number()
 			.optional()
@@ -483,7 +524,11 @@
 		email_confirm: '',
 		password: '',
 		password_confirm: '',
-		birthday: '',
+		birthday: {
+			year: 0,
+			month: 0,
+			day: 0
+		},
 		gender: 0,
 		job: 0,
 		terms: false,
@@ -580,6 +625,22 @@
 			window.location.href = '/account/register/success'
 		}
 	}
+
+
+	// 生年月日
+	const years = computed(() => {
+		const current = new Date().getFullYear() - 15
+		return Array.from({ length: 85 }, (_, i) => current - i) // 100 years ago
+	})
+
+	const daysInMonth = computed(() => {
+		const y = Number(form.value.birthday.year)
+		const m = Number(form.value.birthday.month)
+		if (!y || !m) return []
+		return new Date(y, m, 0).getDate()
+			? Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => i + 1)
+			: []
+	})
 
 
 	// 郵便番号検索
