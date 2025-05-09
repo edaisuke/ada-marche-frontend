@@ -6,6 +6,7 @@ export default {
     title: "商品一覧",
     price: "価格",
     switch_language: "言語を切り替える",
+    loading: '読み込み中...',
 
     theme: {
         light: "ライトモード",
@@ -74,6 +75,7 @@ export default {
         privacy: "プライバシーポリシー",
 
         cancel: "同意しない",
+        confirm: "確認する",
         register: "同意する",
 
         loading: '読み込み中...',
@@ -157,7 +159,7 @@ export default {
             },
             birthday: {
                 required: "生年月日は必須です。",
-                invalid: "生年月日が正しくありません。",
+                invalid: "正しい日付を選択してください",
             },
             gender: {
                 required: "性別は必須です。",
@@ -174,6 +176,28 @@ export default {
                 required: "プライバシーポリシーに同意する必要があります。",
             }
         }
+    },
+
+    register_confirm: {
+        title: '確認画面',
+        password: '**********',
+        password_hidden: '(セキュリティのため非表示)',
+    },
+
+    register_complete: {
+        title: '仮登録完了',
+        completed: '仮登録が完了しました！',
+        thanks: 'ご登録ありがとうございます。',
+        now_temporary_member_status: '現在、仮会員の状態です。',
+        sent_to_your_email: 'ご入力いただいたメールアドレス宛に、ご本人様確認用のメールをお送りいたしました',
+        click_activate_link: 'メール本文内のURLをクリックすると、本会員登録が完了となります。',
+    },
+
+    register_activated: {
+        title: '会員登録完了',
+        checking: '確認しています...',
+        activated: '会員登録が完了しました。',
+        login_and_shopping: 'メールアドレスとパスワードでログイン後、ショッピングをお楽しみください。',
     },
 
     forgot: {

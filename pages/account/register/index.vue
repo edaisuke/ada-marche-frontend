@@ -1,5 +1,5 @@
 <template>
-	<form @submit.prevent="submit">
+	<form @submit.prevent="gotoConfirm">
 		<div class="max-w-6xl mx-auto p-16 md:px-32">
 
 			<h2 class="text-3xl font-bold p-7 text-center">{{ $t('register.title') }}</h2>
@@ -263,22 +263,25 @@
 					<label class="font-bold">
 						{{ $t('register.birthday') }}
 					</label>
-					<div class="">
-						<select v-model="form.birthday.year" class="border rounded p-2">
+					<div class="gap-2 items-center">
+						<select v-model="form.birthday.year" ref="year" @change="focusNext('month')" class="border rounded p-2">
 							<option value="0">年</option>
 							<option v-for="y in years" :key="y" :value="y">{{ y }}年</option>
 						</select>
-						<select v-model="form.birthday.month" class="border rounded p-2">
+						<select v-model="form.birthday.month" ref="month" @change="focusNext('day')" class="border rounded p-2">
 							<option value="0">月</option>
 							<option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
 						</select>
-						<select v-model="form.birthday.day" class="border rounded p-2">
+						<select v-model="form.birthday.day" ref="day" class="border rounded p-2">
 							<option value="0">日</option>
 							<option v-for="d in daysInMonth" :key="d" :value="d">{{ d }}日</option>
 						</select>
-						<!--
-						<input type="text" v-model="form.birthday" @blur="touched.birthday = true" @input="touched.birthday && validateField('birthday')" :placeholder="$t('register.birthday')" class="border border-gray-300 p-2 rounded w-full" />
-						-->
+						
+						<div class="ml-4 text-sm inline">
+							<div v-if="wareki" class="inline">{{ wareki }}生まれ</div>
+							<div v-if="age !== null" class="inline"> ({{ age }}歳)</div>
+						</div>
+
 						<p class="text-red-500 text-sm" v-if="errors.birthday">
 							{{ errors.birthday }}
 						</p>
@@ -370,15 +373,15 @@
 
 				<div class="flex flex-1 justify-around mx-auto">
 					<div>
-						<NuxtLink :to="{ path: $localePath('/account')}" class="bg-gray-900 text-gray-100 dark:bg-gray-100 dark:text-gray-900 hover:bg-gray-600 hover:dark:bg-gray-400 rounded my-5 px-10 p-3">
+						<NuxtLink :to="{ path: $localePath('/account')}" class="inline-block bg-gray-900 text-gray-100 dark:bg-gray-100 dark:text-gray-900 hover:bg-gray-600 hover:dark:bg-gray-400 rounded my-5 px-10 p-3">
 							{{ $t('register.cancel') }}
 						</NuxtLink>
 					</div>
 
 					<div>
-					<a @click="submit()" class="cursor-pointer bg-red-600 text-gray-100 dark:bg-red-600 dark:text-gray-900 hover:bg-red-800 hover:dark:bg-red-800 rounded my-5 px-12 p-3">
-						{{ $t('register.register') }}
-					</a>
+					<button type="button" @click="gotoConfirm" class="appearance-none inline-block bg-red-600 text-gray-100 dark:bg-red-600 dark:text-gray-900 hover:bg-red-800 hover:dark:bg-red-800 rounded my-5 px-10 p-3">
+						{{ $t('register.confirm') }}
+					</button>
 					</div>
 				</div>
 
@@ -391,17 +394,21 @@
 <script lang="ts" setup>
 
 	import { useI18n } from 'vue-i18n'
-	import { useAsyncData } from 'nuxt/app'
-	import { computed, ref, watch, watchEffect } from 'vue'
+	import { navigateTo } from 'nuxt/app'
+	import { computed, nextTick, onMounted, ref, watch } from 'vue'
 	import { z } from 'zod'
-	import { useAllSelectables } from '../../composables/useAllSelectables'
-	import { usePostalCodeSearch } from '../../composables/usePostalCodeSearch'
+	import { useAllSelectables } from '~/composables/useAllSelectables'
+	import { usePostalCodeSearch } from '~/composables/usePostalCodeSearch'
+	import { useRegisterFormStore } from '~/stores/registerForm'
 	import PasswordStrengthBar from '~/components/PasswordStrengthBar'
-	import PostalCandidateModal from '../../components/PostalCandidateModal'
+	import PostalCandidateModal from '~/components/PostalCandidateModal'
+
+
+	const store = useRegisterFormStore()
 
 	const { t: $t } = useI18n()
 
-	const { prefs, jobs, genders, refreshAll } = useAllSelectables({
+	const { prefs, jobs, genders } = useAllSelectables({
 		include: ['prefs', 'jobs', 'genders']
 	})
 
@@ -493,7 +500,7 @@
 				const date = new Date(`${year}-${month}-${day}`)
 				return !isNaN(date.getTime())
 			}, {
-				message: '正しい日付を選択してください',
+				message: $t('register.error.birthday.invalid'),
 				path: ['birthday']
 			}),
 		gender: z
@@ -534,6 +541,15 @@
 		terms: false,
 		privacy: false
 	})
+
+	onMounted(() => {
+		store.load()
+		Object.assign(form.value, store.formData)
+	})
+
+	watch(form, (val) => {
+		store.set({ ...val })
+	}, { deep: true })
 
 	const touched = ref<Record<keyof typeof form.value, boolean>>(
 		Object.fromEntries(
@@ -588,7 +604,7 @@
 		) as Record<keyof typeof form.value, string>
 	}
 
-	const submit = async () => {
+	const gotoConfirm = async () => {
 		errors.value = createEmptyErrors()
 
 		const fullSchema = schema
@@ -608,22 +624,19 @@
 				const field = err.path[0] as keyof typeof form.value
 				errors.value[field] = err.message
 			}
+			console.warn('Validation failed', result.error)
 			return
 		}
 
-		const { error } = await useAsyncData('register', () => {
-			return $fetch('/api/account/register', {
-				method: 'POST',
-				body: form.value
-			})
-		})
-
-		if (error.value) {
-			// エラーメッセージ
-		} else {
-			// Redirect to success page
-			window.location.href = '/account/register/success'
+		try {
+			store.set(form.value)
+		} catch (e) {
+			console.log(e)
 		}
+
+		// Redirect to confirm page
+		console.log('navigating...')
+		return navigateTo('/account/register/confirm')
 	}
 
 
@@ -642,6 +655,38 @@
 			: []
 	})
 
+	const age = computed(() => {
+		const { year, month, day } = form.value.birthday
+		if (!year || !month || !day) return null
+		const birthDate = new Date(year, month - 1, day)
+		const today = new Date()
+		let age = today.getFullYear() - birthDate.getFullYear()
+		const beforeBirthday = today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
+		if (beforeBirthday) age--
+		return age
+	})
+
+	// 和暦表示 (令和・平成・昭和)
+	const wareki = computed(() => {
+		const y = form.value.birthday.year
+		if (!y) return ''
+		if (y >= 2019) return `令和${y - 2018}年`
+		if (y >= 1989) return `平成${y - 1988}年`
+		if (y >= 1926) return `昭和${y - 1925}年`
+		return ''
+	})
+
+	// 自動フォーカス
+	const year = ref<HTMLSelectElement | null>(null)
+	const month = ref<HTMLSelectElement | null>(null)
+	const day = ref<HTMLSelectElement | null>(null)
+
+	function focusNext(next: 'month' | 'day') {
+		nextTick(() => {
+			if (next === 'month') month.value?.focus()
+			if (next === 'day') day.value?.focus()
+		})
+	}
 
 	// 郵便番号検索
 	const {
