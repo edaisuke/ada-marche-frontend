@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<div v-if="isLoading" class="fixed inset-0 flex items-center justify-center bg-white z-50">
+		<div v-show="isLoading" class="fixed inset-0 flex items-center justify-center bg-white z-50">
 			<div class="flex flex-col gap-1 items-center">
 				<div v-for="n in 4" :key="n" class="w-6 h-6 bg-gray-500 animate-bounce" :style="{
 					animationDelay: (n * 0.2) + 's'
 				}"></div>
 			</div>
 		</div>
-		<NuxtLayout v-else>
+		<NuxtLayout>
 
 			<NuxtPage />
 			<!--

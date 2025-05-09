@@ -6,6 +6,7 @@ export default {
     title: "商品一覧",
     price: "価格",
     switch_language: "言語を切り替える",
+    loading: '読み込み中...',
 
     theme: {
         light: "ライトモード",
@@ -74,9 +75,14 @@ export default {
         privacy: "プライバシーポリシー",
 
         cancel: "同意しない",
+        confirm: "確認する",
         register: "同意する",
 
+        loading: '読み込み中...',
+        select: '選択してください',
+
         error: {
+
             last_name: {
                 required: "姓は必須です。",
                 max: "姓は最大50文字までです。",
@@ -88,10 +94,12 @@ export default {
             last_kana: {
                 required: "セイは必須です。",
                 max: "セイは最大50文字までです。",
+                katakana: '全角カタカナのみで入力してください',
             },
             first_kana: {
                 required: "メイは必須です。",
                 max: "メイは最大50文字までです。",
+                katakana: '全角カタカナのみで入力してください',
             },
             display_name: {
                 required: "表示名は必須です。",
@@ -100,7 +108,7 @@ export default {
             post_code: {
                 required: "郵便番号は必須です。",
                 max: "郵便番号は最大8文字までです。",
-                regex: "郵便番号は半角数字で入力してください。",
+                regex: "郵便番号は半角数字のみかハイフンを含む形式で入力してください。",
             },
             prefecture: {
                 required: "都道府県は必須です。",
@@ -117,9 +125,9 @@ export default {
                 max: "建物名・部屋番号は最大50文字までです。",
             },
             phone_number: {
-                required: "電話番号は必須です。",
+                required: "電話番号は10文字以上で入力してください。",
                 max: "電話番号は最大15文字までです。",
-                regex: "電話番号は半角数字で入力してください。",
+                only_number: "電話番号は半角数字で入力してください。",
             },
             email: {
                 required: "メールアドレスは必須です。",
@@ -141,12 +149,17 @@ export default {
                 max: "パスワードは最大100文字までです。",
                 regex: "パスワードは半角英数字で入力してください。",
                 strong: "パスワードは強力なものを選択してください。",
+                weak: "パスワードは強力なものを入力してください。",
+            },
+            password_confirm: {
+                required: "パスワード確認は必須です。",
+                min: "パスワード確認は10文字以上で入力してください。",
+                max: "パスワード確認は最大100文字までです。",
                 same: "パスワードと一致しません。",
-                confirm: "パスワードが一致しません。",
             },
             birthday: {
                 required: "生年月日は必須です。",
-                invalid: "生年月日が正しくありません。",
+                invalid: "正しい日付を選択してください",
             },
             gender: {
                 required: "性別は必須です。",
@@ -163,6 +176,28 @@ export default {
                 required: "プライバシーポリシーに同意する必要があります。",
             }
         }
+    },
+
+    register_confirm: {
+        title: '確認画面',
+        password: '**********',
+        password_hidden: '(セキュリティのため非表示)',
+    },
+
+    register_complete: {
+        title: '仮登録完了',
+        completed: '仮登録が完了しました！',
+        thanks: 'ご登録ありがとうございます。',
+        now_temporary_member_status: '現在、仮会員の状態です。',
+        sent_to_your_email: 'ご入力いただいたメールアドレス宛に、ご本人様確認用のメールをお送りいたしました',
+        click_activate_link: 'メール本文内のURLをクリックすると、本会員登録が完了となります。',
+    },
+
+    register_activated: {
+        title: '会員登録完了',
+        checking: '確認しています...',
+        activated: '会員登録が完了しました。',
+        login_and_shopping: 'メールアドレスとパスワードでログイン後、ショッピングをお楽しみください。',
     },
 
     forgot: {

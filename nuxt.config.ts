@@ -4,6 +4,7 @@ import { resolve } from 'path'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	compatibilityDate: '2024-11-01',
+	ssr: true,
 	app: {
 		head: {
 		title: "ada-marché.com",
@@ -12,7 +13,6 @@ export default defineNuxtConfig({
 		]
 		}
 	},
-	ssr: true,
 	alias: {
 		'@': resolve(__dirname, '.'),
 		'~': resolve(__dirname, '.'),
@@ -42,7 +42,8 @@ export default defineNuxtConfig({
 		//    '@nuxtjs/nuxtjs-heroicons/solid/24/mini',
 		//    '@nuxtjs/nuxtjs-heroicons/solid/24/solid',
 		'@nuxtjs/i18n',
-		'@nuxt/icon'
+		'@nuxt/icon',
+		'@pinia/nuxt'
 	],
 	vite: {
 		server: {
