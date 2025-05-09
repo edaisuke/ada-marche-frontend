@@ -6,6 +6,7 @@
 				v-model="rawPassword"
 				:placeholder="placeholder"
 				:autocomplete="autocomplete"
+
 				class="border border-gray-300 rounded-md p-2 w-full"
 			/>
 			<button
@@ -13,6 +14,7 @@
 				@click="passwordVisible = !passwordVisible"
 				class="absolute right-2 top-2 text-gray-500 hover:text-gray-800 text-xl"
 				:aria-label="t('password.toggle_visibility')"
+				tabindex="-1"
 			><Icon :name="passwordVisible ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" /></button>
 		</div>
 		<div class="h-2 bg-gray-200 rounded">
@@ -77,7 +79,8 @@ const props = withDefaults(defineProps<Props>(),{
 })
 
 const emit = defineEmits<{
-	(e: 'update:value', value: string): void,
+	(e: 'update:modelValue', value: string): void,
+	(e: 'input', value: string): void,
 	(e: 'update:score', value: number): void,
 	(e: 'update:strictScore', value: number): void
 }>()
@@ -90,7 +93,8 @@ watch(() => props.modelValue, (val) => {
 })
 
 watch(rawPassword, (val) => {
-	emit('update:value', val)
+	emit('update:modelValue', val)
+	emit('input', val)
 })
 
 const hasUpper = computed(() => /[A-Z]/.test(rawPassword.value))
