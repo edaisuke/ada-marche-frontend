@@ -15,7 +15,7 @@
         </section>
     </div>
     <div class="max-w-6xl mx-auto p-8">
-        <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">{{ $t('title') }}</h1>
+        <!-- <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">{{ $t('title') }}</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div
                 v-for="product in products"
@@ -37,13 +37,13 @@
                     </p>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script setup lang="ts">
-    const { data: products, error } = useAsyncData('products', () => {
-        console.log('🔄 API呼び出し中...')
-        return $fetch('/api/products')
-    })
+    // const { data: products, error } = useAsyncData('products', () => {
+    //     console.log('🔄 API呼び出し中...')
+    //     return $fetch('/api/products')
+    // })
 </script>
