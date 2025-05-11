@@ -1,9 +1,18 @@
 <template>
 	<div :class="{ dark: isDark }" class="min-h-screen">
+
+		<client-only>
+			<transition name="fade" appear>
+				<div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center">
+					<p>Loading...</p>
+				</div>
+			</transition>
+		</client-only>
+
 		<div class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 			<header class="p-2 flex justify-between">
 
-				<nav class="mt-7">
+				<nav class="mt-7 font-medium">
 					<NuxtLink :to="{ path: $localePath('/') }" :title="$t('header.home')" class="m-5">{{ $t('home') }}</NuxtLink>
 					<NuxtLink :to="{ path: $localePath('/shop') }" :title="$t('header.shop')" class="m-5">{{ $t('shop') }}</NuxtLink>
 					<NuxtLink :to="{ path: $localePath('/guide') }" :title="$t('header.guide')" class="m-5">{{ $t('guide') }}</NuxtLink>
@@ -11,7 +20,7 @@
 
 				<h1 class="text-xl font-bold">
 					<NuxtLink :to="{ path: $localePath('/') }" :title="$t('header.title')">
-						<Icon name="amc:crown-logo" size="70px" :alt="$t('site_name')" class="dark:invert" />
+						<Icon name="amc:crown-logo" size="76px" :alt="$t('site_name')" class="w-[76px] h-[76px] dark:invert hover:opacity-70" />
 					</NuxtLink>
 				</h1>
 
@@ -43,10 +52,31 @@
 </template>
 
 <script lang="ts" setup>
-	import { ref } from 'vue';
+	import { useNuxtApp } from 'nuxt/app';
+	import { onMounted, ref } from 'vue';
 	import LanguageSelector from '~/components/LanguageSelector';
 	import Footer from '~/components/Footer';
 
 	const isDark = ref(false)
+
+	const isLoading = ref(true)
+
+	onMounted(() => {
+		const nuxtApp = useNuxtApp()
+
+		if (!nuxtApp.isHydrating) {
+			finishLoading()
+		} else {
+			nuxtApp.hook('app:suspense:resolve', () => {
+				finishLoading()
+			})
+		}
+
+		function finishLoading() {
+			setTimeout(() => {
+				isLoading.value = false
+			}, 300) // delay 300ms
+		}
+	})
 
 </script>

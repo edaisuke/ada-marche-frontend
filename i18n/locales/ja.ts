@@ -274,6 +274,21 @@ export default {
             useFewWords: 'いくつかの単語を使用し、よく使われるフレーズは避けてください。',
             noNeedForSymbols: '記号、数字、大文字は必ずしも必要ありません。'
         }
+    },
+
+    products: {
+
+        regular_price: '通常価格',
+        product_code: '商品コード',
+        quantity: '数量',
+        add_cart: 'カートに入れる',
+
+        detail: {
+
+            title: '商品詳細',
+            relative_category: '関連カテゴリー',
+        }
+
     }
 
 } as const

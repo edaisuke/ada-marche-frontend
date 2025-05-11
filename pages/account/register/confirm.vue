@@ -74,9 +74,14 @@
 					<div>
 						<dt class="text-sm font-medium">生年月日</dt>
 						<dd class="mt-1 text-base text-gray-900">
-							{{ form.birthday.year }}年
-							{{ form.birthday.month }}月
-							{{ form.birthday.day }}日
+							<span v-if="form.birthday.year > 0 && form.birthday.month > 0 && form.birthday.day > 0">
+								{{ form.birthday.year }}年
+								{{ form.birthday.month }}月
+								{{ form.birthday.day }}日
+							</span>
+							<span v-else>
+								未選択
+							</span>
 						</dd>
 					</div>
 
@@ -108,13 +113,13 @@
 
 			</div>
 
-			<div class="mt-10 flex justify-center gap-4">
+			<div class="mt-10 flex justify-center gap-10">
 
-				<button @click="navigateTo('/account/register')" class="px-6 py-2 rounded bg-gray-400 text-white hover:bg-gray-500">
+				<button @click="navigateTo('/account/register/')" class="px-12 py-2 rounded bg-gray-400 text-white hover:bg-gray-500">
 					戻る
 				</button>
 
-				<button @click="submit" class="px-6 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+				<button @click="submit" class="px-12 py-2 rounded bg-red-600 text-white hover:bg-red-700">
 					登録
 				</button>
 
