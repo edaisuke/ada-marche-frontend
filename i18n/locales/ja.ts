@@ -7,6 +7,9 @@ export default {
     price: "価格",
     switch_language: "言語を切り替える",
     loading: '読み込み中...',
+    price_p: '₳',
+    price_s: '',
+    total: '合計',
 
     theme: {
         light: "ライトモード",
@@ -288,6 +291,25 @@ export default {
             title: '商品詳細',
             relative_category: '関連カテゴリー',
         }
+
+    },
+
+    cart: {
+
+        view: {
+
+            title: 'ショッピングカート',
+
+            product_delete: '削除',
+            product_summary: '商品内容',
+            product_amount: '数量',
+            product_subtotal: '小計',
+        }
+    },
+
+    checkout: {
+
+        title: 'ご注文手続き',
 
     }
 

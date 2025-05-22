@@ -4,13 +4,13 @@ import { resolve } from 'path'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	compatibilityDate: '2024-11-01',
-	ssr: true,
 	app: {
 		head: {
-		title: "ada-marché.com",
-		link: [
-			{ rel: 'icon', href: "/img/favicon-32x32.png", sizes: "32x32" },
-		]
+			title: 'ada-marché.com',
+			titleTemplate: '%s | ada-marché.com',
+			link: [
+				{ rel: 'icon', href: "/img/favicon-32x32.png", sizes: "32x32" },
+			]
 		}
 	},
 	alias: {
@@ -45,31 +45,50 @@ export default defineNuxtConfig({
 		'@nuxt/icon',
 		'@pinia/nuxt'
 	],
+	plugins: [
+		'~/plugins/buffer-polyfill.client.ts',
+	],
 	vite: {
+		assetsInclude: ['**/*.wasm'],
+		build: {
+			assetsInlineLimit: 0,
+		},
+		define: {
+			global: {},
+			Buffer: ['buffer', 'Buffer'],
+		},
+		resolve: {
+			alias: {
+				'buffer': 'buffer/',
+			}
+		},
+		optimizeDeps: {
+			include: ['buffer'],
+		},
 		server: {
-		watch: {
-			usePolling: true,
-		}
+			watch: {
+				usePolling: true,
+			}
 		}
 	},
 	icon: {
 		customCollections: [
-		{
-			prefix: 'amc',
-			dir: './public/svg'
-		}
+			{
+				prefix: 'amc',
+				dir: './public/svg'
+			}
 		]
 	},
 	i18n: {
 		locales: [
-				{ code: 'ja', name: '日本語', file: 'ja.ts' },
-				{ code: 'en', name: 'English', file: 'en.ts' }
-			],
-			defaultLocale: 'ja',
-			lazy: true,
-			langDir: 'locales',
-			strategy: 'prefix_except_default',
-			detectBrowserLanguage: {
+			{ code: 'ja', name: '日本語', file: 'ja.ts' },
+			{ code: 'en', name: 'English', file: 'en.ts' }
+		],
+		defaultLocale: 'ja',
+		lazy: true,
+		langDir: 'locales',
+		strategy: 'prefix_except_default',
+		detectBrowserLanguage: {
 			useCookie: true,
 			fallbackLocale: 'ja'
 		},

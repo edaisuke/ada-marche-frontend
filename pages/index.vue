@@ -4,7 +4,7 @@
             <div class="max-w-6xl mx-auto">
                 <div class="text-4xl font-sans font-bold dark:text-gray-900 my-10">
                     For Cardano Community<br />
-                    Shopping Site
+                    RWA Shopping Site
                 </div>
                 <div class="my-5">
                     <NuxtLink :to="{ path: $localePath('/shop') }" class="text-sm bg-gray-900 text-gray-100 rounded p-3" :title="$t('top.shop_now')">

@@ -10,6 +10,10 @@
 	],
 	"compilerOptions": {
 		"types": ["vue", "vue-i18n"],
-		"baseUrl": "."
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./*"],
+			"@/*": ["./*"]
+		}
 	}
 }
