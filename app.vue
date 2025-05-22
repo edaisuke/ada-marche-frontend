@@ -34,11 +34,11 @@
 	@keyframes bounce {
 		0%, 100% {
 			transform: translateY(0);
-			opcity: 0.6;
+			opacity: 0.6;
 		}
 		50% {
 			transform: translateY(-12px);
-			opcity: 1;
+			opacity: 1;
 		}
 	}
 

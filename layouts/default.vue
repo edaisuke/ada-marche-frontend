@@ -16,6 +16,7 @@
 					<NuxtLink :to="{ path: $localePath('/') }" :title="$t('header.home')" class="m-5">{{ $t('home') }}</NuxtLink>
 					<NuxtLink :to="{ path: $localePath('/shop') }" :title="$t('header.shop')" class="m-5">{{ $t('shop') }}</NuxtLink>
 					<NuxtLink :to="{ path: $localePath('/guide') }" :title="$t('header.guide')" class="m-5">{{ $t('guide') }}</NuxtLink>
+					<a class="m-5">Q&amp;A</a>
 				</nav>
 
 				<h1 class="text-xl font-bold">
@@ -30,9 +31,14 @@
 					<NuxtLink :to="{ path: $localePath('/account') }" :title="$t('header.account')">
 						<Icon name="line-md:account" size="1.5em" class="m-2" />
 					</NuxtLink>
-					<NuxtLink :to="{ path: $localePath('/cart') }" :title="$t('header.cart')">
-						<Icon name="streamline:shopping-cart-1" size="1.5em" class="m-2" />
-					</NuxtLink>
+					<div class="inline-block relative">
+						<NuxtLink :to="{ path: $localePath('/cart') }" :title="$t('header.cart')">
+							<Icon name="streamline:shopping-cart-1" size="1.5em" class="m-2" />
+							<span class="absolute top-0 -right-1 text-xs font-bold opacity-90 bg-red-500 text-white rounded-full w-auto px-1.5 h-5 flex items-center justify-center">
+								{{ cartCount }}
+							</span>
+						</NuxtLink>
+					</div>
 
 					<button @click="isDark = !isDark" :title="isDark ? $t('theme.light') : $t('theme.dark')" class="px-2 py-2 align-top text-lg" type="button">
 						{{ isDark ? '🌞' : '🌙' }}
@@ -52,10 +58,12 @@
 </template>
 
 <script lang="ts" setup>
-	import { useNuxtApp } from 'nuxt/app';
+	import { useNuxtApp, useState } from 'nuxt/app';
 	import { onMounted, ref } from 'vue';
 	import LanguageSelector from '~/components/LanguageSelector';
 	import Footer from '~/components/Footer';
+
+	const cartCount = useState('cartCount', () => 0)
 
 	const isDark = ref(false)
 

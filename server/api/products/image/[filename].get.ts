@@ -7,5 +7,5 @@ export default defineEventHandler(async (event) => {
         return 'No filename provided'
     }
 
-    return await apiFetch(`/product/image/${filename}`);
+    return await apiFetch(event, `/products/image/${filename}`);
 })

@@ -1,42 +1,58 @@
+import { H3Event } from "h3"
 import { handleApiError } from "./handleApiError"
 import type { Token } from "~/types/Token"
 
-export const apiFetch = async <T>(path: string, options: any = {}): Promise<T> => {
+export const apiFetch = async <T>(
+        event: H3Event,
+        path: string,
+        options: Omit<Parameters<typeof $fetch>[1], 'headers' | 'credentials'> = {}
+    ): Promise<T> => {
+    
     const baseURL = process.env.API_BASE_URL || ''
 
-    let token = null
+    const cookies = event.node.req.headers.cookie || ''
 
-    // SSRならCookieから
-    if (process.server) {
-    } else {
-        // クライアント側
-        token = getAccessToken()
-    }
+    return await $fetch<T>(`${baseURL}${path}`, {
+        headers: {
+            cookie: cookies,
+        },
+        credentials: 'include',
+        ...options
+    })
 
-    let authHeader = token === null ? {} : { Authorization: `Bearer ${token}` }
-    const headers: HeadersInit = {
-        ...(options.headers || authHeader),
-    }
+    // let token = null
 
-    try {
-        return await $fetch<T>(baseURL + path, {
-            ...options,
-            headers,
-            credentials: 'include',
-        })
-    } catch (error: any) {
-        if (error?.response?.status === 401) {
-            console.warn('アクセストークン切れ、リフレッシュ試行中')
-            await refreshToken()
-            return await $fetch<T>(baseURL + path, {
-                ...options,
-                headers,
-                credentials: 'include',
-            })
-        }
-        handleApiError(error)
-        throw error
-    }
+    // // SSRならCookieから
+    // if (process.server) {
+    // } else {
+    //     // クライアント側
+    //     token = getAccessToken()
+    // }
+
+    // let authHeader = token === null ? {} : { Authorization: `Bearer ${token}` }
+    // const headers: HeadersInit = {
+    //     ...(options.headers || authHeader),
+    // }
+
+    // try {
+    //     return await $fetch<T>(baseURL + path, {
+    //         ...options,
+    //         headers,
+    //         credentials: 'include',
+    //     })
+    // } catch (error: any) {
+    //     if (error?.response?.status === 401) {
+    //         console.warn('アクセストークン切れ、リフレッシュ試行中')
+    //         await refreshToken()
+    //         return await $fetch<T>(baseURL + path, {
+    //             ...options,
+    //             headers,
+    //             credentials: 'include',
+    //         })
+    //     }
+    //     handleApiError(error)
+    //     throw error
+    // }
 }
 
 const extractTokenFromCookie = (cookie: string): string | null => {

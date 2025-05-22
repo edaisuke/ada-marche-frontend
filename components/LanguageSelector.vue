@@ -30,4 +30,5 @@
         { emoji: '🇯🇵', code: 'ja', name: '日本語' },
         { emoji: '🇺🇸', code: 'en', name: 'English' }
     ];
+
 </script>
